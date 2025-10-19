@@ -8,9 +8,7 @@ function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет прибыли от операции
     const { discount, sale_price, quantity } = purchase;
     const discountRate = 1 - discount / 100;
-    const revenue = sale_price * quantity * discountRate;
-    const cost = _product.purchase_price * quantity;
-    return revenue - cost;
+    return sale_price * quantity * discountRate;
 }
 
 /**
@@ -94,18 +92,16 @@ function analyzeSalesData(data, options) {
         if (!product) return;
 
         const discountRate = 1 - item.discount / 100;
-        const itemRevenue = item.sale_price * item.quantity * discountRate;
-
+        const itemRevenue = calculateRevenue(item, product);
         seller.revenue += itemRevenue;
-
-        const profit = calculateRevenue(item, product);
-        seller.profit += profit;
-
+        const itemCost = product.purchase_price * item.quantity;
+        const itemProfit = itemRevenue - itemCost;
+        seller.profit += itemProfit;
         if (!seller.products_sold[item.sku]) {
             seller.products_sold[item.sku] = 0;
         }
         seller.products_sold[item.sku] += item.quantity;
-    });
+        });
 });
 
     // @TODO: Сортировка продавцов по прибыли
